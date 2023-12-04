@@ -2,6 +2,20 @@ import pandas as pd
 import numpy as np
 from datetime import date
 
+def prepare_data(data):
+  # Drop columns using uitility function
+  data = drop_columns(data)
+  ## Transfer extra data to appropriate columns
+  data = transfer_data(data)
+  # Remove rows with missing values
+  data = data.dropna()
+  # Clean up data
+  data = clean_data(data)
+  # Add car age column
+  data = create_car_age_column(data)
+
+  return data
+
 def drop_columns(data):
   # Drop columns
   columns_to_drop = [
@@ -27,14 +41,17 @@ def drop_columns(data):
     'VehType',
     'VehTransmission',
     ]
+
   return data.drop(columns_to_drop, axis=1)
 
 def transfer_data(data):
   transfer_drive_train_data(data)
+
   return data
 
 def transfer_data_column(data, column_to_search, search_for, column_to_update, update_with):
   data[column_to_update] = np.where(data[column_to_search].str.contains('|'.join(search_for)), update_with, data[column_to_update])
+  
   return data
 
 def transfer_drive_train_data(data):
@@ -49,16 +66,19 @@ def transfer_drive_train_data(data):
   transfer_data_column(data, column_to_search, ['rwd'], column_to_update, 'RWD')
   transfer_data_column(data, column_to_search, ['2wd'], column_to_update, '2WD')
   transfer_data_column(data, column_to_search, ['4x2'], column_to_update, '2WD')
+  
   return data
 
 def clean_data(data):
   clean_ext_color_column(data)
   clean_trim_column(data)
   clean_drive_train_column(data)
+  
   return data
 
 def clean_data_column(data, column, search_for, replace_with):
   data[column] = np.where(data[column].str.contains('|'.join(search_for)), replace_with, data[column])
+  
   return data
 
 def clean_ext_color_column(data):
@@ -85,6 +105,7 @@ def clean_ext_color_column(data):
   
   # Delete certain values
   data.drop(data[data[column] == 'Unknown'].index, inplace=True)
+  
   return data
 
 def clean_trim_column(data):
@@ -126,10 +147,12 @@ def clean_drive_train_column(data):
   clean_data_column(data, column, ['4wd', '4x4', 'four'], '4WD')
   clean_data_column(data, column, ['fwd', 'front'], 'FWD')
   clean_data_column(data, column, ['2wd', 'two'], '2WD')
+  
   return data
 
 def create_car_age_column(data):
   data['Car_Age'] = date.today().year - data['VehYear']
+  
   return data
 
   

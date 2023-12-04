@@ -1,22 +1,16 @@
-from utils.helper_functions import drop_columns
-from utils.helper_functions import transfer_data
-from utils.helper_functions import clean_data
-from utils.helper_functions import create_car_age_column
+from utils.helper_functions import prepare_data
+
+def preprocess_and_save(raw_data, output_file_name):
+  # Prepare data
+  processed_data = preprocess_data(raw_data)
+  # Save processed data
+  processed_data.to_csv(output_file_name, index=False)
+
+  return processed_data
 
 def preprocess_data(raw_data):
-  # Drop columns using uitility function
-  data = drop_columns(raw_data)
+  # Process data
+  processed_data = prepare_data(raw_data.copy())
 
-  ## Transfer extra data to appropriate columns
-  data = transfer_data(data)
-
-  # Remove rows with missing values
-  data = data.dropna()
-
-  # Clean up data
-  data = clean_data(data)
-
-  # Add car age column
-  data = create_car_age_column(data)
-
-  return data
+  return processed_data
+  
